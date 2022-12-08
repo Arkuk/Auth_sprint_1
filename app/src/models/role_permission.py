@@ -11,3 +11,6 @@ class RolePermission(IdMixin, CreatedTimeMixin):
 
     role_id = db.Column(UUID(as_uuid=True), db.ForeignKey("role.id"))
     permission_id = db.Column(UUID(as_uuid=True), db.ForeignKey("permission.id"))
+
+    role = db.relationship("Role")
+    permission = db.relationship("Permission")
