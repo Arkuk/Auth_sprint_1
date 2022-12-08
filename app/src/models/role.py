@@ -1,3 +1,5 @@
+from sqlalchemy.orm import relationship
+
 from db.postgres import db
 from models.mixins import (IdMixin,
                            CreatedTimeMixin,
