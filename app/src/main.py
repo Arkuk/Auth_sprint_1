@@ -1,18 +1,20 @@
 from flask import Flask
-from flask_migrate import Migrate
 from db.postgres import db
+from flask_migrate import Migrate
+from models.user import User
+from models.permission import Permission
+from models.role import Role
+from models.role_permission import RolePermission
+from models.user import User
+from models.user_login_history import UserLoginHistory
+from models.user_role import UserRole
 
 app = Flask(__name__)
-
-app.config.from_object('core.config.Settings')
-
 migrate = Migrate(app, db)
+app.config.from_object('core.config.Settings')
+db.init_app(app)
 
 
-@app.route('/hello-world')
-def hello_world():
-    return 'Hello, World!'
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run()

@@ -11,4 +11,5 @@ class Settings(object):
                               f'{os.getenv("AUTH_POSTGRES_PASSWORD")}@' \
                               f'localhost:{os.getenv("AUTH_POSTGRES_PORT")}/' \
                               f'{os.getenv("AUTH_POSTGRES_NAME")}'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
