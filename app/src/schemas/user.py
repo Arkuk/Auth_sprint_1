@@ -10,3 +10,8 @@ user_schema_login = {
     'username': fields.String(required=True),
     'password1': fields.String(required=True),
 }
+
+user_schema_response = {
+    'id': fields.String(required=True),
+    'username': fields.String(required=True),
+}

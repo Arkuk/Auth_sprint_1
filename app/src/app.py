@@ -1,7 +1,7 @@
 from flask import Flask
 
 from flask_migrate import Migrate
-
+from flask_jwt_extended import JWTManager
 from db.postgres import db
 import models
 from api import api
@@ -13,11 +13,12 @@ def create_app(config=None):
     app.config.from_object('core.config.Settings')
     # батарейка для миграций
     migrate = Migrate(app, db)
-    # инит дб
+    # инициализация дб
     db.init_app(app)
-    # инит рест апи
+    # инициализация рест апи
     api.init_app(app)
-
+    # инициализация jwt
+    jwt = JWTManager(app)
     return app
 
 
