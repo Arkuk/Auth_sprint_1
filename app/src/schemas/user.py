@@ -1,12 +1,12 @@
-from main import ma
-from models.user import User
+from flask_restx import fields
 
+user_schema_register = {
+    'username': fields.String(required=True),
+    'password1': fields.String(required=True),
+    'password2': fields.String(required=True),
+}
 
-class UserSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        fields = ("id", "username")
-        model = User
-
-
-user_schema = UserSchema()
-users_schema = UserSchema(many=True)
+user_schema_login = {
+    'username': fields.String(required=True),
+    'password1': fields.String(required=True),
+}
