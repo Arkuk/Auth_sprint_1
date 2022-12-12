@@ -19,8 +19,8 @@ class Register(Resource):
     @api.response(int(HTTPStatus.CONFLICT), 'Passwords dont match \n'
                                             'Username already exits')
     def post(self):
-        auth_service.create_user(api.payload)
-        return api.payload, 201
+        result = auth_service.create_user(api.payload)
+        return result, 201
 
 
 @api.route('/login')

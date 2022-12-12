@@ -40,6 +40,8 @@ class AuthService:
                 new_user = User(username=username, password=self.hash_password(password1))
                 db.session.add(new_user)
                 db.session.commit()
+                db.session.refresh(new_user)
+                return new_user
 
             else:
                 abort(HTTPStatus.CONFLICT, f'Username {username} already exists')
