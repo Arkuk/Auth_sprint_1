@@ -16,8 +16,8 @@ user_schema_response = api.model('UserSchemaResponse', user_schema_response)
 class Register(Resource):
     @api.expect(user_schema_register)
     @api.marshal_with(user_schema_response, code=201)
-
-    @api.response(int(HTTPStatus.CONFLICT), 'Passwords dont match')
+    @api.response(int(HTTPStatus.CONFLICT), 'Passwords dont match \n'
+                                            'Username already exits')
     def post(self):
         auth_service.create_user(api.payload)
         return api.payload, 201
