@@ -4,8 +4,15 @@ class AuthService:
         pass
 
     def check_username(self):
-        """Проверка username на наличие"""
+        """Проверка username на наличие в базе"""
+        pass
 
     def create_user(self):
         """Создание юзера"""
+        pass
+
+    def login_user(self):
+        pass
+
+    def logout_user(self):
         pass
