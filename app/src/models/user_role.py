@@ -1,17 +1,17 @@
+import uuid
+
 from sqlalchemy.dialects.postgresql import UUID
-
 from db.postgres import db
-from models.mixins import (IdMixin,
-                           CreatedTimeMixin
-                           )
 
-
-class UserRole(IdMixin, CreatedTimeMixin):
-    __tablename__ = "user_role"
-    __table_args__ = (db.UniqueConstraint("user_id", "permission_id"),)
-
-    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey("user.id"))
-    permission_id = db.Column(UUID(as_uuid=True), db.ForeignKey("permission.id"))
-
-    user = db.relationship("User")
-    role = db.relationship("Role")
+user_role = db.Table(
+    'user_role',
+    db.Column('id',
+              UUID(as_uuid=True),
+              primary_key=True,
+              default=uuid.uuid4,
+              unique=True,
+              nullable=False,
+              ),
+    db.Column('user_id', db.ForeignKey('user.id')),
+    db.Column('role_id', db.ForeignKey('role.id')),
+)

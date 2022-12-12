@@ -10,7 +10,6 @@ api = Api(
     title='Auth',
     description='Auth for praktikum',
     doc='/swagger',
-    prefix='/api/v1',
 )
 
 api.add_namespace(api_not_authorized, path='/api/v1')
