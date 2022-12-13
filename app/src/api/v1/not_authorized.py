@@ -14,9 +14,7 @@ responses_tokens = api.model('ResponsesTokens', responses_tokens)
 
 parser = reqparse.RequestParser()
 parser.add_argument('User-Agent', location='headers')
-parser.add_argument('X-Forwarded-For', location='headers')
-parser.add_argument('client-ip-http-header', location='headers')
-parser.add_argument('HTTP_CLIENT_IP', location='headers')
+
 
 
 
@@ -39,9 +37,6 @@ class Login(Resource):
     @api.marshal_with(responses_tokens, code=200)
     @api.response(int(HTTPStatus.BAD_REQUEST), 'Wrong login or password')
     def post(self):
-        args = parser.parse_args()
-        print(args)
-
-
-        result = auth_service.login_user(api.payload)
-        return result.json
+        user_agent = parser.parse_args()['User-Agent']
+        result = auth_service.login_user(api.payload, user_agent)
+        return result
