@@ -105,7 +105,13 @@ class AuthService:
     def refresh_token(self, jwt: dict, user_agent: str):
         user_id = jwt['sub']
         if self.check_for_id_in_base(user_id):
-            pass
+            tokens = self.create_tokens(user_id)
+            redis_cache.put_data_to_cache(user_id,
+                                          user_agent,
+                                          tokens['refresh_token'])
+            return tokens
+
+
 
     def logout_user(self):
         pass

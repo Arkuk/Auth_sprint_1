@@ -13,12 +13,14 @@ auth_service = auth_service
 @api.route('/refresh')
 class Refresh(Resource):
 
-    # @api.marshal_with(responses_tokens, code=200)
+    @api.marshal_with(responses_tokens, code=200)
     @jwt_required(refresh=True)
     def post(self):
         jwt = get_jwt()
         user_agent = parser.parse_args()['User-Agent']
-        auth_service.refresh_token(jwt, user_agent)
+        result = auth_service.refresh_token(jwt, user_agent)
+        return result
+
 
 
 
