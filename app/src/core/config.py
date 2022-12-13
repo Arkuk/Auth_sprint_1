@@ -15,7 +15,8 @@ class Settings(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_TOKEN_LOCATION = 'headers'
     JWT_SECRET_KEY = 'super-secret'  # Change this!
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=1)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
 
 
+settings = Settings()

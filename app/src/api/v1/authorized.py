@@ -1,7 +1,9 @@
 from flask_restx import Namespace, Resource, reqparse
-from flask_jwt_extended import jwt_required, get_jwt, get_unverified_jwt_headers
+from flask_jwt_extended import jwt_required, get_jwt
 from schemas.token import responses_tokens
 from services.auth import auth_service
+
+
 api = Namespace('API для сайта и личного кабинета. Авторизованные пользователи')
 
 responses_tokens = api.model('Token', responses_tokens)
@@ -12,7 +14,6 @@ auth_service = auth_service
 
 @api.route('/refresh')
 class Refresh(Resource):
-
     @api.marshal_with(responses_tokens, code=200)
     @jwt_required(refresh=True)
     def post(self):

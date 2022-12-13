@@ -1,16 +1,15 @@
 from flask_restx import abort
 from flask_restx._http import HTTPStatus
 from db.postgres import db
-from db.redis import redis_cache
+from db.redis import jwt_redis_blocklist
 from models.user import User
 from models.user_login_history import UserLoginHistory
 from sqlalchemy.exc import NoResultFound
 from passlib.hash import argon2
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import create_refresh_token
-
-
-redis_cache = redis_cache
+from datetime import timedelta
+from core.config import settings
 
 
 class AuthService:
@@ -93,25 +92,28 @@ class AuthService:
             if self.validate_password(password, hash_password):
                 self.create_record_history(user_in_base.id, user_agent)
                 tokens = self.create_tokens(str(user_in_base.id))
-                redis_cache.put_data_to_cache(str(user_in_base.id),
-                                              user_agent,
-                                              tokens['refresh_token'])
+                # redis_cache.put_data_to_cache(str(user_in_base.id),
+                #                               user_agent,
+                #                               tokens['refresh_token'])
                 return tokens
             else:
                 abort(HTTPStatus.UNAUTHORIZED, 'Wrong login or password')
         else:
             abort(HTTPStatus.UNAUTHORIZED, 'Wrong login or password')
 
-    def refresh_token(self, jwt: dict, user_agent: str):
+    def add_token_to_blacklist(self, jti: str, access_expires: timedelta):
+        jwt_redis_blocklist.set(jti, "", ex=access_expires)
+
+    def refresh_token(self, jwt: dict):
         user_id = jwt['sub']
+        jti = jwt['jti']
         if self.check_for_id_in_base(user_id):
             tokens = self.create_tokens(user_id)
-            redis_cache.put_data_to_cache(user_id,
-                                          user_agent,
-                                          tokens['refresh_token'])
+            self.add_token_to_blacklist(jti, settings.JWT_REFRESH_TOKEN_EXPIRES)
+            # redis_cache.put_data_to_cache(user_id,
+            #                               user_agent,
+            #                               tokens['refresh_token'])
             return tokens
-
-
 
     def logout_user(self):
         pass

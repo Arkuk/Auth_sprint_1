@@ -8,7 +8,7 @@ class AbstractCache:
         pass
 
     @abc.abstractmethod
-    def put_data_to_cache(self, id_: str, data: str):
+    def put_data_to_cache(self, id_: str, user_agent: str,  data: str):
         """Записать в кэш данные"""
         pass
 
