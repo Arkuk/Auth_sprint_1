@@ -13,7 +13,7 @@ class Settings(object):
                               f'localhost:{os.getenv("AUTH_POSTGRES_PORT")}/' \
                               f'{os.getenv("AUTH_POSTGRES_NAME")}'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    JWT_SECRET_KEY = "super-secret"  # Change this!
+    JWT_SECRET_KEY = 'super-secret'  # Change this!
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
 

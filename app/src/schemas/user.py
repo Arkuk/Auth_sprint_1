@@ -12,7 +12,7 @@ user_schema_register = {
 
 user_schema_login = {
     'username': fields.String(required=True),
-    'password1': fields.String(required=True),
+    'password': fields.String(required=True),
 }
 
 user_schema_response = {
