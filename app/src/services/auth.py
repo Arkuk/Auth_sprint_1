@@ -6,8 +6,9 @@ from models.user import User
 from models.user_login_history import UserLoginHistory
 from sqlalchemy.exc import NoResultFound
 from passlib.hash import argon2
-from flask_jwt_extended import create_access_token
-from flask_jwt_extended import create_refresh_token
+from flask_jwt_extended import create_access_token, create_refresh_token, verify_jwt_in_request
+from flask_jwt_extended.exceptions import RevokedTokenError, JWTDecodeError, NoAuthorizationError
+from jwt.exceptions import ExpiredSignatureError
 from datetime import timedelta
 from core.config import settings
 
@@ -118,8 +119,22 @@ class AuthService:
     def logout_user(self, jti: str, ttype: str):
         if ttype == 'access':
             self.add_token_to_blacklist(jti, settings.JWT_ACCESS_TOKEN_EXPIRES)
+            abort(HTTPStatus.NO_CONTENT, 'Access token is exist')
         if ttype == 'refresh':
             self.add_token_to_blacklist(jti, settings.JWT_REFRESH_TOKEN_EXPIRES)
+            abort(HTTPStatus.NO_CONTENT, 'Refresh token is exist')
+
+    def verify_token(self, *args, **kwargs):
+        try:
+            verify_jwt_in_request(*args, **kwargs)
+        except RevokedTokenError:
+            abort(HTTPStatus.UNAUTHORIZED, 'Token is not corrected')
+        except NoAuthorizationError:
+            abort(HTTPStatus.UNAUTHORIZED, 'No token')
+        except JWTDecodeError:
+            abort(HTTPStatus.UNPROCESSABLE_ENTITY, 'Token is not corrected')
+        except ExpiredSignatureError:
+            abort(HTTPStatus.UNPROCESSABLE_ENTITY, 'Token is not corrected')
 
 
 auth_service = AuthService()

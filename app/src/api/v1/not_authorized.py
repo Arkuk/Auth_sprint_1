@@ -22,7 +22,7 @@ parser.add_argument('User-Agent', location='headers')
 @api.route('/register')
 class Register(Resource):
     @api.expect(user_schema_register)
-    @api.marshal_with(user_schema_response, code=201)
+    @api.marshal_with(user_schema_response, code=int(HTTPStatus.CREATED))
     @api.response(int(HTTPStatus.CONFLICT), 'Passwords dont match \n'
                                             'Username already exits')
     @api.response(int(HTTPStatus.BAD_REQUEST), 'Bad request')
@@ -34,7 +34,7 @@ class Register(Resource):
 @api.route('/login')
 class Login(Resource):
     @api.expect(user_schema_login)
-    @api.marshal_with(responses_tokens, code=200)
+    @api.marshal_with(responses_tokens, code=int(HTTPStatus.OK))
     @api.response(int(HTTPStatus.BAD_REQUEST), 'Wrong login or password')
     def post(self):
         user_agent = parser.parse_args()['User-Agent']
