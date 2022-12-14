@@ -21,5 +21,6 @@ psycopg2-binary==2.9.5
 passlib==1.7.4
 argon2-cffi==21.3.0
 redis==4.4.0
+click==8.1.3
 
 

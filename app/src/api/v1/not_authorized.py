@@ -28,7 +28,7 @@ class Register(Resource):
     @api.response(int(HTTPStatus.BAD_REQUEST), 'Bad request')
     def post(self):
         result = auth_service.create_user(api.payload)
-        return result, 201
+        return result
 
 
 @api.route('/login')

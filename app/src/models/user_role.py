@@ -14,4 +14,5 @@ user_role = db.Table(
               ),
     db.Column('user_id', db.ForeignKey('user.id')),
     db.Column('role_id', db.ForeignKey('role.id')),
+    db.Column('created', db.DateTime, default=db.func.now())
 )

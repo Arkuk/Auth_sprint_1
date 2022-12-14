@@ -8,7 +8,7 @@ from sqlalchemy.exc import NoResultFound
 from passlib.hash import argon2
 from flask_jwt_extended import create_access_token, create_refresh_token, verify_jwt_in_request
 from flask_jwt_extended.exceptions import RevokedTokenError, JWTDecodeError, NoAuthorizationError
-from jwt.exceptions import ExpiredSignatureError
+from jwt.exceptions import InvalidSignatureError
 from datetime import timedelta
 from core.config import settings
 
@@ -108,33 +108,36 @@ class AuthService:
     def refresh_token(self, jwt: dict):
         user_id = jwt['sub']
         jti = jwt['jti']
-        if self.check_for_id_in_base(user_id):
-            tokens = self.create_tokens(user_id)
-            self.add_token_to_blacklist(jti, settings.JWT_REFRESH_TOKEN_EXPIRES)
-            # redis_cache.put_data_to_cache(user_id,
-            #                               user_agent,
-            #                               tokens['refresh_token'])
-            return tokens
+        tokens = self.create_tokens(user_id)
+        print(tokens)
+        self.add_token_to_blacklist(jti, settings.JWT_REFRESH_TOKEN_EXPIRES)
+        # redis_cache.put_data_to_cache(user_id,
+        #                               user_agent,
+        #                               tokens['refresh_token'])
+        return tokens
 
     def logout_user(self, jti: str, ttype: str):
         if ttype == 'access':
             self.add_token_to_blacklist(jti, settings.JWT_ACCESS_TOKEN_EXPIRES)
-            abort(HTTPStatus.NO_CONTENT, 'Access token is exist')
+            return {'status': 'Access token is exist'}, HTTPStatus.NO_CONTENT
         if ttype == 'refresh':
             self.add_token_to_blacklist(jti, settings.JWT_REFRESH_TOKEN_EXPIRES)
-            abort(HTTPStatus.NO_CONTENT, 'Refresh token is exist')
+            return {'status': 'Refresh token is exist'}, HTTPStatus.NO_CONTENT
 
     def verify_token(self, *args, **kwargs):
         try:
-            verify_jwt_in_request(*args, **kwargs)
+            return verify_jwt_in_request(*args, **kwargs)
         except RevokedTokenError:
             abort(HTTPStatus.UNAUTHORIZED, 'Token is not corrected')
         except NoAuthorizationError:
             abort(HTTPStatus.UNAUTHORIZED, 'No token')
         except JWTDecodeError:
             abort(HTTPStatus.UNPROCESSABLE_ENTITY, 'Token is not corrected')
-        except ExpiredSignatureError:
+        except InvalidSignatureError:
             abort(HTTPStatus.UNPROCESSABLE_ENTITY, 'Token is not corrected')
+        except Exception as e:
+            print(e.__class__)
+
 
 
 auth_service = AuthService()
