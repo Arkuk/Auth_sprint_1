@@ -32,7 +32,7 @@ class AuthService:
         Проверка id на наличие в базе
         """
         try:
-            user = db.session.execute(db.select(User).filter_by(id=user_id)).one()
+            user = db.session.execute(db.select(User).filter_by(roles=user_id)).one()
             return user[0]
         except NoResultFound:
             return False
