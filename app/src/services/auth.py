@@ -115,8 +115,11 @@ class AuthService:
             #                               tokens['refresh_token'])
             return tokens
 
-    def logout_user(self):
-        pass
+    def logout_user(self, jti: str, ttype: str):
+        if ttype == 'access':
+            self.add_token_to_blacklist(jti, settings.JWT_ACCESS_TOKEN_EXPIRES)
+        if ttype == 'refresh':
+            self.add_token_to_blacklist(jti, settings.JWT_REFRESH_TOKEN_EXPIRES)
 
 
 auth_service = AuthService()

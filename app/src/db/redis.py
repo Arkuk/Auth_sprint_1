@@ -1,7 +1,6 @@
 import os
 
 import redis
-from db.cache import AbstractCache
 
 redis_host = os.getenv("AUTH_POSTGRES_USER")
 redis_port = os.getenv("AUTH_POSTGRES_USER")

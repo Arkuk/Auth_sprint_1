@@ -36,14 +36,20 @@ class Me(Resource):
 
 
 @api.route('/login_history')
-class Me(Resource):
+class LoginHistory(Resource):
 
     def get(self):
         pass
 
 
 @api.route('/logout')
-class Me(Resource):
-
-    def post(self):
-        pass
+class Logout(Resource):
+    """
+    https://flask-jwt-extended.readthedocs.io/en/stable/blocklist_and_token_revoking/#revoking-refresh-tokens
+    """
+    @jwt_required(verify_type=False)
+    def delete(self):
+        token = get_jwt()
+        jti = token['jti']
+        ttype = token['type']
+        auth_service.logout_user(jti, ttype)

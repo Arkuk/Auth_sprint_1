@@ -17,6 +17,7 @@ class Settings(object):
     JWT_SECRET_KEY = 'super-secret'  # Change this!
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
+    RESTX_MASK_SWAGGER = False
 
 
 settings = Settings()
