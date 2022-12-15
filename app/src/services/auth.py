@@ -1,3 +1,6 @@
+from functools import wraps
+from typing import Union, Sequence
+
 from flask_restx import abort
 from flask_restx._http import HTTPStatus
 from db.postgres import db
@@ -11,6 +14,9 @@ from flask_jwt_extended.exceptions import RevokedTokenError, JWTDecodeError, NoA
 from jwt.exceptions import InvalidSignatureError
 from datetime import timedelta
 from core.config import settings
+from flask_jwt_extended import get_jwt
+
+LocationType = Union[str, Sequence, None]
 
 
 class AuthService:
@@ -109,7 +115,6 @@ class AuthService:
         user_id = jwt['sub']
         jti = jwt['jti']
         tokens = self.create_tokens(user_id)
-        print(tokens)
         self.add_token_to_blacklist(jti, settings.JWT_REFRESH_TOKEN_EXPIRES)
         # redis_cache.put_data_to_cache(user_id,
         #                               user_agent,
@@ -124,20 +129,48 @@ class AuthService:
             self.add_token_to_blacklist(jti, settings.JWT_REFRESH_TOKEN_EXPIRES)
             return {'status': 'Refresh token is exist'}, HTTPStatus.NO_CONTENT
 
-    def verify_token(self, *args, **kwargs):
-        try:
-            return verify_jwt_in_request(*args, **kwargs)
-        except RevokedTokenError:
-            abort(HTTPStatus.UNAUTHORIZED, 'Token is not corrected')
-        except NoAuthorizationError:
-            abort(HTTPStatus.UNAUTHORIZED, 'No token')
-        except JWTDecodeError:
-            abort(HTTPStatus.UNPROCESSABLE_ENTITY, 'Token is not corrected')
-        except InvalidSignatureError:
-            abort(HTTPStatus.UNPROCESSABLE_ENTITY, 'Token is not corrected')
-        except Exception as e:
-            print(e.__class__)
+    def verify_token(optional: bool = False,
+                     fresh: bool = False,
+                     refresh: bool = False,
+                     locations: LocationType = None,
+                     verify_type: bool = True, ):
+        """Декоратор для проверки токена и выброса нужного статуса в случае не валидного токена"""
 
+        def wrapper(fn):
+            @wraps(fn)
+            def decorator(*args, **kwargs):
+                try:
+                    verify_jwt_in_request(optional, fresh, refresh, locations, verify_type)
+                except RevokedTokenError:
+                    abort(HTTPStatus.UNAUTHORIZED, 'Token is not corrected')
+                except NoAuthorizationError:
+                    abort(HTTPStatus.UNAUTHORIZED, 'No token')
+                except JWTDecodeError:
+                    abort(HTTPStatus.UNPROCESSABLE_ENTITY, 'Token is not corrected')
+                except InvalidSignatureError:
+                    abort(HTTPStatus.UNPROCESSABLE_ENTITY, 'Token is not corrected')
+                except Exception as e:
+                    print(e.__class__)
+                return fn(*args, **kwargs)
+
+            return decorator
+
+        return wrapper
+
+    def check_roles(self, name_roles: list[str]):
+        """Декоратор для проверки роли"""
+        def wrapper(fn):
+            @wraps(fn)
+            def decorator(*args, **kwargs):
+                name_roles_jwt = get_jwt()['roles']
+                # Пересечение ролей для ручки и ролей в токене
+                if list(set(name_roles) & set(name_roles_jwt)):
+                    return fn(*args, **kwargs)
+                else:
+                    abort(HTTPStatus.FORBIDDEN, 'Permission denied')
+            return decorator
+
+        return wrapper
 
 
 auth_service = AuthService()

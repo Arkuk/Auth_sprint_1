@@ -39,4 +39,5 @@ class Login(Resource):
     def post(self):
         user_agent = parser.parse_args()['User-Agent']
         result = auth_service.login_user(api.payload, user_agent)
+        print(result)
         return result

@@ -6,28 +6,31 @@ from services.auth import auth_service
 
 api = Namespace('API для сайта и личного кабинета. Авторизованные пользователи')
 
-responses_tokens = api.model('Token', responses_tokens)
+responses_tokens = api.model('ResponsesTokens', responses_tokens)
 parser = reqparse.RequestParser()
 parser.add_argument('User-Agent', location='headers')
 
 
 @api.route('/refresh')
 class Refresh(Resource):
-    @api.marshal_with(responses_tokens, code=HTTPStatus.OK)
     @api.response(int(HTTPStatus.UNAUTHORIZED), 'Token is not corrected\n'
                                                 'No token')
     @api.response(int(HTTPStatus.UNPROCESSABLE_ENTITY), 'Token is not corrected\n')
+    @api.marshal_with(responses_tokens, code=int(HTTPStatus.OK))
+    @auth_service.verify_token(refresh=True)
+    @auth_service.check_roles(['admin'])
     def post(self):
-        if auth_service.verify_token(refresh=True):
-            jwt = get_jwt()
-            # user_agent = parser.parse_args()['User-Agent']
-            result = auth_service.refresh_token(jwt)
-            return result
+        jwt = get_jwt()
+        # user_agent = parser.parse_args()['User-Agent']
+        result = auth_service.refresh_token(jwt)
+        return result
 
 
 @api.route('/me')
 class Me(Resource):
 
+    @auth_service.verify_token()
+    @auth_service.check_roles(['admin'])
     def get(self):
         pass
 
@@ -49,11 +52,10 @@ class Logout(Resource):
     @api.response(int(HTTPStatus.UNAUTHORIZED), 'Token is not corrected\n'
                                                 'No token')
     @api.response(int(HTTPStatus.UNPROCESSABLE_ENTITY), 'Token is not corrected\n')
+    @auth_service.verify_token(verify_type=False)
     def delete(self):
-        if auth_service.verify_token(verify_type=False):
-            token = get_jwt()
-            print(token)
-            jti = token['jti']
-            ttype = token['type']
-            result = auth_service.logout_user(jti, ttype)
-            return result
+        token = get_jwt()
+        jti = token['jti']
+        ttype = token['type']
+        result = auth_service.logout_user(jti, ttype)
+        return result
