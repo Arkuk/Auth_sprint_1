@@ -9,8 +9,8 @@ from models.user_login_history import UserLoginHistory
 from sqlalchemy.exc import NoResultFound
 from passlib.hash import argon2
 from flask_jwt_extended import create_access_token, create_refresh_token, verify_jwt_in_request
-from flask_jwt_extended.exceptions import RevokedTokenError, JWTDecodeError, NoAuthorizationError
-from jwt.exceptions import InvalidSignatureError, ExpiredSignatureError
+from flask_jwt_extended.exceptions import RevokedTokenError, NoAuthorizationError
+from jwt.exceptions import InvalidSignatureError, ExpiredSignatureError, DecodeError
 from datetime import timedelta
 from core.config import settings
 from flask_jwt_extended import get_jwt
@@ -153,13 +153,14 @@ class AuthService:
                                                   refresh=refresh,
                                                   verify_type=verify_type,
                                                   locations=['headers'])
+                    print(12)
                     if not token:
                         raise NoAuthorizationError
                 except RevokedTokenError:
                     abort(HTTPStatus.UNAUTHORIZED, 'Token is not corrected')
                 except NoAuthorizationError:
                     abort(HTTPStatus.UNAUTHORIZED, 'No token')
-                except JWTDecodeError:
+                except DecodeError:
                     abort(HTTPStatus.UNPROCESSABLE_ENTITY, 'Token is not corrected')
                 except InvalidSignatureError:
                     abort(HTTPStatus.UNPROCESSABLE_ENTITY, 'Token is not corrected')

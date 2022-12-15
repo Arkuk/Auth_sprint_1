@@ -80,12 +80,12 @@ class LoginHistory(Resource):
 # https://flask-jwt-extended.readthedocs.io/en/stable/blocklist_and_token_revoking/#revoking-refresh-tokens
 @api.route('/logout')
 class Logout(Resource):
+    @auth_service.verify_token(verify_type=False)
     @api.response(int(HTTPStatus.NO_CONTENT), 'Access token is exist\n'
                                               'Refresh token is exist')
     @api.response(int(HTTPStatus.UNAUTHORIZED), 'Token is not corrected\n'
                                                 'No token')
     @api.response(int(HTTPStatus.UNPROCESSABLE_ENTITY), 'Token is not corrected\n')
-    @auth_service.verify_token(verify_type=False)
     def delete(self):
         jwt = get_jwt()
         jti = jwt['jti']
