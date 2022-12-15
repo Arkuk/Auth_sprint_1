@@ -19,3 +19,23 @@ user_schema_response = {
     'id': fields.String(required=True),
     'username': fields.String(required=True),
 }
+
+user_schema_long_response = {
+    'id': fields.String(required=True),
+    'username': fields.String(required=True),
+    'created': fields.DateTime(required=True)
+}
+
+login_history_schema = {
+    'id': fields.String(required=True),
+    'user_agent': fields.String(required=True),
+    'created': fields.DateTime(required=True)
+}
+
+change_password_schema = {
+    'old_password': fields.String(required=True),
+    'new_password1': fields.String(required=True,
+                               pattern=r'(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z!@#$%^&*]{6,}'),
+    'new_password2': fields.String(required=True,
+                               pattern=r'(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z!@#$%^&*]{6,}'),
+}

@@ -1,5 +1,4 @@
 from functools import wraps
-from typing import Union, Sequence
 
 from flask_restx import abort
 from flask_restx._http import HTTPStatus
@@ -11,12 +10,10 @@ from sqlalchemy.exc import NoResultFound
 from passlib.hash import argon2
 from flask_jwt_extended import create_access_token, create_refresh_token, verify_jwt_in_request
 from flask_jwt_extended.exceptions import RevokedTokenError, JWTDecodeError, NoAuthorizationError
-from jwt.exceptions import InvalidSignatureError
+from jwt.exceptions import InvalidSignatureError, ExpiredSignatureError
 from datetime import timedelta
 from core.config import settings
 from flask_jwt_extended import get_jwt
-
-LocationType = Union[str, Sequence, None]
 
 
 class AuthService:
@@ -34,9 +31,6 @@ class AuthService:
         return {'access_token': access_token, 'refresh_token': refresh_token}
 
     def check_for_id_in_base(self, user_id: str):
-        """
-        Проверка id на наличие в базе
-        """
         try:
             user = db.session.execute(db.select(User).filter_by(id=user_id)).one()
             return user[0]
@@ -44,9 +38,6 @@ class AuthService:
             return False
 
     def check_for_useername_in_base(self, username: str) -> User | bool:
-        """
-        Проверка username на наличие в базе
-        """
         try:
             user = db.session.execute(db.select(User).filter_by(username=username)).one()
             return user[0]
@@ -67,7 +58,6 @@ class AuthService:
     #         return False
 
     def create_user(self, body: dict):
-        """Создание юзера"""
         username = body['username']
         password1 = body['password1']
         password2 = body['password2']
@@ -83,6 +73,25 @@ class AuthService:
                 abort(HTTPStatus.CONFLICT, f'Username {username} already exists')
         else:
             abort(HTTPStatus.CONFLICT, 'Passwords dont match')
+
+    def change_password(self, body: dict, user_id: str):
+        old_password = body['old_password']
+        new_password1 = body['new_password1']
+        new_password2 = body['new_password2']
+        user_in_base = self.check_for_id_in_base(user_id)
+        if user_in_base:
+            hash_password = user_in_base.password
+            if self.validate_password(old_password, hash_password):
+                if self.password_comparison(new_password1, new_password2):
+                    user_in_base.password = self.hash_password(new_password2)
+                    db.session.add(user_in_base)
+                    db.session.commit()
+                else:
+                    abort(HTTPStatus.CONFLICT, 'New passwords dont matches')
+            else:
+                abort(HTTPStatus.CONFLICT, 'Wrong old password')
+        else:
+            abort(HTTPStatus.BAD_REQUEST, 'Wrong user')
 
     def create_record_history(self, user_id, user_agent):
         new_history_record = UserLoginHistory(user_id=user_id, user_agent=user_agent)
@@ -132,7 +141,6 @@ class AuthService:
     def verify_token(optional: bool = False,
                      fresh: bool = False,
                      refresh: bool = False,
-                     locations: LocationType = None,
                      verify_type: bool = True, ):
         """Декоратор для проверки токена и выброса нужного статуса в случае не валидного токена"""
 
@@ -140,7 +148,13 @@ class AuthService:
             @wraps(fn)
             def decorator(*args, **kwargs):
                 try:
-                    verify_jwt_in_request(optional, fresh, refresh, locations, verify_type)
+                    token = verify_jwt_in_request(optional=optional,
+                                                  fresh=fresh,
+                                                  refresh=refresh,
+                                                  verify_type=verify_type,
+                                                  locations=['headers'])
+                    if not token:
+                        raise NoAuthorizationError
                 except RevokedTokenError:
                     abort(HTTPStatus.UNAUTHORIZED, 'Token is not corrected')
                 except NoAuthorizationError:
@@ -149,6 +163,8 @@ class AuthService:
                     abort(HTTPStatus.UNPROCESSABLE_ENTITY, 'Token is not corrected')
                 except InvalidSignatureError:
                     abort(HTTPStatus.UNPROCESSABLE_ENTITY, 'Token is not corrected')
+                except ExpiredSignatureError:
+                    abort(HTTPStatus.UNPROCESSABLE_ENTITY, 'The token has expired')
                 except Exception as e:
                     print(e.__class__)
                 return fn(*args, **kwargs)
@@ -159,6 +175,7 @@ class AuthService:
 
     def check_roles(self, name_roles: list[str]):
         """Декоратор для проверки роли"""
+
         def wrapper(fn):
             @wraps(fn)
             def decorator(*args, **kwargs):
@@ -168,6 +185,7 @@ class AuthService:
                     return fn(*args, **kwargs)
                 else:
                     abort(HTTPStatus.FORBIDDEN, 'Permission denied')
+
             return decorator
 
         return wrapper
