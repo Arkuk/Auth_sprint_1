@@ -1,18 +1,28 @@
 from flask_restx import Namespace, Resource
-from services.roles import role_service
+from flask_restx._http import HTTPStatus
 
-api = Namespace('API для управления доступами. Связь юзера и его ролей')
+from services.user_roles import user_roles
+from schemas.user_roles import user_roles_schema_response, assign_role_schema
 
+api = Namespace('API для управления доступами. Управляение ролями пользователей')
 
-@api.route('/users/{user_id}/roles')
+user_roles_schema_response = api.model('UserRoleResponse', user_roles_schema_response)
+assign_role_schema = api.model('UserRoleResponse', assign_role_schema)
+
+@api.route('/user/roles')
 class Roles(Resource):
+
+    @api.marshal_with(user_roles_schema_response, code=int(HTTPStatus.OK))
     def get(self):
-        user_id = '00aa5956-bd2d-4478-b8a7-9f25b1a0516c'
-        roles = role_service.get_roles(user_id=user_id)
+        roles = user_roles.get_user_roles(api.payload)
         return roles
 
+    @api.marshal_with(assign_role_schema, code=int(HTTPStatus.CREATED))
     def post(self):
-        pass
+        roles = user_roles.assign_role(api.payload)
+        return roles
 
+    @api.marshal_with(assign_role_schema, code=int(HTTPStatus.OK))
     def delete(self):
-        pass
+        roles = user_roles.discard_role(api.payload)
+        return roles
