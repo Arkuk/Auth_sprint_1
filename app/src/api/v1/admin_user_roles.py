@@ -9,20 +9,26 @@ api = Namespace('API для управления доступами. Управ�
 user_roles_schema_response = api.model('UserRoleResponse', user_roles_schema_response)
 assign_role_schema = api.model('UserRoleResponse', assign_role_schema)
 
-@api.route('/user/roles')
+@api.route('/<user_id>/roles')
 class Roles(Resource):
 
     @api.marshal_with(user_roles_schema_response, code=int(HTTPStatus.OK))
-    def get(self):
-        roles = user_roles.get_user_roles(api.payload)
+    def get(self, user_id):
+        roles = user_roles.get_user_roles(user_id)
         return roles
 
-    @api.marshal_with(assign_role_schema, code=int(HTTPStatus.CREATED))
-    def post(self):
-        roles = user_roles.assign_role(api.payload)
+    @api.marshal_with(user_roles_schema_response, code=int(HTTPStatus.CREATED))
+    def post(self, user_id):
+        roles = user_roles.assign_role(user_id, api.payload)
         return roles
 
+    @api.marshal_with(user_roles_schema_response, code=int(HTTPStatus.OK))
+    def delete(self, user_id):
+        roles = user_roles.discard_role(user_id, api.payload)
+        return roles
+
+    '''тестовая ручка, удалить'''
     @api.marshal_with(assign_role_schema, code=int(HTTPStatus.OK))
-    def delete(self):
-        roles = user_roles.discard_role(api.payload)
+    def put(self, user_id):
+        roles = user_roles.all_users_roles()
         return roles
