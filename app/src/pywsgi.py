@@ -3,7 +3,7 @@ from gevent import monkey
 monkey.patch_all()
 
 from gevent.pywsgi import WSGIServer
-from main import app
+from app import app
 
-http_server = WSGIServer(('', 5001), app)
+http_server = WSGIServer(('127.0.0.1', 5001), app)
 http_server.serve_forever()
