@@ -26,9 +26,3 @@ class Roles(Resource):
     def delete(self, user_id):
         roles = user_roles.discard_role(user_id, api.payload)
         return roles
-
-    '''тестовая ручка, удалить'''
-    @api.marshal_with(assign_role_schema, code=int(HTTPStatus.OK))
-    def put(self, user_id):
-        roles = user_roles.all_users_roles()
-        return roles
