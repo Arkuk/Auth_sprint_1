@@ -5,6 +5,8 @@ from api.v1.admin_users import api as api_admin_users
 # from api.v1.admin_permissions import api as api_admin_permissions
 # from api.v1.admin_role_permissions import api as api_admin_role_permissions
 from api.v1.admin_user_roles import api as api_admin_user_roles
+from api.v1.admin_roles import api as api_admin_roles
+
 api = Api(
     version='1.0',
     title='Auth',
@@ -18,3 +20,4 @@ api.add_namespace(api_admin_users, path='/api/v1')
 # api.add_namespace(api_admin_permissions, path='/api/v1')
 # api.add_namespace(api_admin_role_permissions, path='/api/v1')
 api.add_namespace(api_admin_user_roles, path='/api/v1')
+api.add_namespace(api_admin_roles, path='/api/v1')
