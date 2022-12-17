@@ -15,7 +15,5 @@ api = Api(
 api.add_namespace(api_not_authorized, path='/api/v1')
 api.add_namespace(api_authorized, path='/api/v1')
 api.add_namespace(api_admin_users, path='/api/v1')
-#api.add_namespace(api_admin_permissions, path='/api/v1')
-#api.add_namespace(api_admin_role_permissions, path='/api/v1')
 api.add_namespace(api_admin_user_roles, path='/api/v1')
 api.add_namespace(api_admin_roles, path='/api/v1')

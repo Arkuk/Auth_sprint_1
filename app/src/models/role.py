@@ -2,7 +2,6 @@ from db.postgres import db
 from models.mixins import (IdMixin,
                            CreatedTimeMixin,
                            UpdatedTimeMixin)
-from models.permission import Permission
 
 
 class Role(IdMixin, CreatedTimeMixin, UpdatedTimeMixin):
