@@ -1,10 +1,20 @@
+import http
+
 import pytest
 
-
 @pytest.mark.asyncio
-async def test_register():
+async def test_register(make_request):
     '''регистрация'''
-    pass
+    response = await make_request(
+        endpoint="/api/v1/register",
+        http_method="post",
+        data={
+            "username": "Tester",
+            "password1": "Qwerty1!",
+            "password2": "Qwerty1!",
+        },
+    )
+    assert response.status == http.HTTPStatus.OK #исправить статус в сервисе авторизации, сейчас при регистрации возвращается 200
 
 
 @pytest.mark.asyncio

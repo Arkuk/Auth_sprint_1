@@ -1,7 +1,19 @@
-import pytest
+from dataclasses import dataclass
+from http.client import HTTPResponse
+
+import aiohttp
 from aiohttp import ClientSession
+import pytest
+from multidict import CIMultiDictProxy
+
 from tests.functional.settings import test_settings
 
+
+@dataclass
+class HTTPResponse:
+    body: dict
+    headers: CIMultiDictProxy[str]
+    status: int
 
 @pytest.fixture(scope='session')
 async def client_session(event_loop):
@@ -9,19 +21,30 @@ async def client_session(event_loop):
     yield session
     await session.close()
 
-
 @pytest.fixture(scope='session')
 def make_request(client_session):
-    async def inner(method: str, params: dict = None):
-        params = params or {}
-        #передалать url, вместо {method} может передавиться id юзера
-        url = 'http://{host}:{port}/api/v1/{method}'.format(
-            host=test_settings.service_host, port=test_settings.service_port, method=method
-        )
-        async with client_session.get(url, params=params) as response:
-            return {
-                'body': await response.json(),
-                'status': response.status,
-            }
+    dispatcher: dict = {
+        "get": client_session.get,
+        "post": client_session.post,
+        "put": client_session.put,
+        "delete": client_session.delete,
+    }
+
+    async def inner(
+        http_method: str,
+        data: dict = {},
+        headers: str = None,
+        endpoint: str = None,
+    ) -> HTTPResponse:
+        async with dispatcher.get(http_method)(
+            url=f"{test_settings.service_url}{endpoint}",
+            headers=headers,
+            json=data,
+        ) as response:
+            return HTTPResponse(
+                body=await response.json(),
+                headers=response.headers,
+                status=response.status,
+            )
 
     return inner

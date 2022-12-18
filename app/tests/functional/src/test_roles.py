@@ -1,11 +1,14 @@
 import pytest
+import http
 
 
 @pytest.mark.asyncio
-async def test_get_roles():
+async def test_get_roles(make_request):
     '''получение списка ролей'''
-    pass
-
+    response = await make_request(
+        endpoint="/api/v1/roles", http_method="get"
+    )
+    assert response.status == http.HTTPStatus.OK
 
 @pytest.mark.asyncio
 async def test_add_role():
