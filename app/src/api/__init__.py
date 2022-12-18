@@ -9,7 +9,7 @@ api = Api(
     version='1.0',
     title='Auth',
     description='Auth for praktikum',
-    doc='/swagger',
+    doc='/api/v1/swagger',
 )
 
 api.add_namespace(api_not_authorized, path='/api/v1')
