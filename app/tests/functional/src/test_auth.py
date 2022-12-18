@@ -2,6 +2,22 @@ import pytest
 
 
 @pytest.mark.asyncio
+async def test_register():
+    '''регистрация'''
+    pass
+
+
+@pytest.mark.asyncio
+async def test_login():
+    '''вход в аккаунт'''
+    pass
+
+@pytest.mark.asyncio
+async def test_login_wrongpassword():
+    '''проверка сценария, при котором пользователь ввел неверный пароль'''
+    pass
+
+@pytest.mark.asyncio
 async def test_token_refresh():
     '''получение нового токена'''
     pass
@@ -9,11 +25,6 @@ async def test_token_refresh():
 @pytest.mark.asyncio
 async def test_user_me():
     '''получение информации о юзере по токену'''
-    pass
-
-@pytest.mark.asyncio
-async def test_user_notme():
-    '''получение информации о юзере, передавая невалидный токен'''
     pass
 
 @pytest.mark.asyncio
