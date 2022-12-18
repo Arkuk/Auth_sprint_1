@@ -29,7 +29,6 @@ class RoleService:
         role_id = body['id']
         name = body['name']
         role = db.session.query(Role).filter_by(id=role_id).one()
-        print(role)
         if role:
             role.name = name
             db.session.commit()
