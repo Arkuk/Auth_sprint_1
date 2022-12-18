@@ -11,7 +11,7 @@ async def client_session(event_loop):
 
 
 @pytest.fixture(scope='session')
-def make_get_request(client_session):
+def make_request(client_session):
     async def inner(method: str, params: dict = None):
         params = params or {}
         #передалать url, вместо {method} может передавиться id юзера
