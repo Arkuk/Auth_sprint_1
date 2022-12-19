@@ -30,9 +30,9 @@ class AuthService:
         refresh_token = create_refresh_token(identity=user_id)
         return {'access_token': access_token, 'refresh_token': refresh_token}
 
-    def check_for_id_in_base(self, user_id: str):
+    def check_for_id_in_base(self, user_id: str) -> User | bool:
         try:
-            user = db.session.execute(db.select(User).filter_by(roles=user_id)).one()
+            user = db.session.execute(db.select(User).filter_by(id=user_id)).one()
             return user[0]
         except NoResultFound:
             return False
@@ -153,7 +153,6 @@ class AuthService:
                                                   refresh=refresh,
                                                   verify_type=verify_type,
                                                   locations=['headers'])
-                    print(12)
                     if not token:
                         raise NoAuthorizationError
                 except RevokedTokenError:

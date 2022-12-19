@@ -1,5 +1,5 @@
-while ! nc -z $AUTH_POSTGRES_HOST $AUTH_POSTGRES_PORT;do
-      sleep 0.1
+while ! nc -z $AUTH_POSTGRES_HOST $AUTH_POSTGRES_PORT; do
+  sleep 5
 done
 cd src
 flask db init

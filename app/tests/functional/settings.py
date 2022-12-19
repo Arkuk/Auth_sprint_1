@@ -13,7 +13,7 @@ class TestSettings(BaseSettings):
     redis_port: str = Field('6379', env='AUTH_REDIS_PORT')
     service_host: str = Field('auth_api', env='AUTH_API_HOST')
     service_port: str = Field('8000', env='AUTH_API_PORT')
-    service_url: str = f"http://0.0.0.0:8000"
+    service_url: str = f"http://127.0.0.1:8000"
     base_dir: str = str(Path(__file__).resolve().parent)
 
 

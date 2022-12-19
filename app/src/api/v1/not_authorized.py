@@ -28,16 +28,15 @@ class Register(Resource):
     @api.response(int(HTTPStatus.BAD_REQUEST), 'Bad request')
     def post(self):
         result = auth_service.create_user(api.payload)
-        return result
+        return result, 201
 
 
 @api.route('/login')
 class Login(Resource):
     @api.expect(user_schema_login)
     @api.marshal_with(responses_tokens, code=int(HTTPStatus.OK))
-    @api.response(int(HTTPStatus.BAD_REQUEST), 'Wrong login or password')
+    @api.response(int(HTTPStatus.UNAUTHORIZED), 'Wrong login or password')
     def post(self):
         user_agent = parser.parse_args()['User-Agent']
         result = auth_service.login_user(api.payload, user_agent)
-        print(result)
-        return result
+        return result, 200

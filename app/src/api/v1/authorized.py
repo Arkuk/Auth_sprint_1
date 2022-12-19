@@ -19,16 +19,16 @@ parser.add_argument('User-Agent', location='headers')
 
 @api.route('/refresh')
 class Refresh(Resource):
+    @auth_service.verify_token(refresh=True)
     @api.response(int(HTTPStatus.UNAUTHORIZED), 'Token is not corrected\n'
                                                 'No token')
     @api.response(int(HTTPStatus.UNPROCESSABLE_ENTITY), 'Token is not corrected\n')
     @api.marshal_with(responses_tokens, code=int(HTTPStatus.OK))
-    @auth_service.verify_token(refresh=True)
     def post(self):
         jwt = get_jwt()
         # user_agent = parser.parse_args()['User-Agent']
         result = auth_service.refresh_token(jwt)
-        return result
+        return result, 200
 
 
 @api.route('/me')
@@ -42,7 +42,7 @@ class Me(Resource):
         jwt = get_jwt()
         user_id = jwt['sub']
         result = user_service.get_detail_user(user_id)
-        return result
+        return result, 200
 
 
 @api.route('/change_password')
@@ -74,7 +74,7 @@ class LoginHistory(Resource):
         jwt = get_jwt()
         user_id = jwt['sub']
         result = user_service.get_login_history(user_id)
-        return result
+        return result, 200
 
 
 # https://flask-jwt-extended.readthedocs.io/en/stable/blocklist_and_token_revoking/#revoking-refresh-tokens
@@ -91,4 +91,4 @@ class Logout(Resource):
         jti = jwt['jti']
         ttype = jwt['type']
         result = auth_service.logout_user(jti, ttype)
-        return result
+        return result, 204

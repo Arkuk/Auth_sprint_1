@@ -17,4 +17,4 @@ class User(Resource):
     @api.response(int(HTTPStatus.NOT_FOUND), 'Not Found')
     def get(self):
         result = admin_service.get_list_data()
-        return result
+        return result, 200
