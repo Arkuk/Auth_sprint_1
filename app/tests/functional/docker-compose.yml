@@ -5,7 +5,7 @@ services:
     build: ../../
     image: auth-image
     environment:
-#      - AUTH_API_HOST=auth_api
+      - AUTH_API_HOST=auth_api
       - AUTH_API_PORT=8000
       - AUTH_REDIS_HOST=redis_test
       - AUTH_REDIS_PORT=6379
@@ -26,7 +26,7 @@ services:
   auth_api_test:
     image: auth-image
     environment:
-#      - AUTH_API_HOST=auth_api
+      - AUTH_API_HOST=auth_api
       - AUTH_API_PORT=8000
       - AUTH_REDIS_HOST=redis_test
       - AUTH_REDIS_PORT=6379
@@ -39,7 +39,9 @@ services:
       - AUTH_ADMIN_PASSWORD=123
       - PYTHONPATH=/app/
     entrypoint: >
-      sh -c "pip install -r ./tests/functional/requirements.txt"
+      sh -c "pip install -r ./tests/functional/requirements.txt
+      && python3 ./tests/functional/utils/wait_for_redis.py
+      && pytest ./tests/functional/src"
     depends_on:
       - auth_api
 

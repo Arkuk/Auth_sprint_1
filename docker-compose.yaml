@@ -9,8 +9,6 @@ services:
       - ${AUTH_API_PORT}
     env_file:
       - .env
-    depends_on:
-      - auth_postgres
 
   auth_nginx:
     image: nginx:latest
@@ -50,8 +48,6 @@ services:
       - auth_redis
     volumes:
       - auth_redis_data:/var/lib/redis/data
-    ports:
-      - 6379:${AUTH_REDIS_PORT}
 
 
 volumes:
