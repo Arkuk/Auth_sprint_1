@@ -37,8 +37,7 @@ services:
       - POSTGRES_DB=${AUTH_POSTGRES_NAME}
     volumes:
       - auth_pg_data:/var/lib/postgresql/data/
-    ports:
-      - 5432:${AUTH_POSTGRES_PORT}
+
 
   auth_redis:
     image: redis:latest
