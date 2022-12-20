@@ -1,7 +1,5 @@
 from db.postgres import db
-from models.mixins import (IdMixin,
-                           CreatedTimeMixin,
-                           UpdatedTimeMixin)
+from models.mixins import CreatedTimeMixin, IdMixin, UpdatedTimeMixin
 
 
 class Role(IdMixin, CreatedTimeMixin, UpdatedTimeMixin):

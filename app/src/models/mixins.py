@@ -27,4 +27,3 @@ class UpdatedTimeMixin(db.Model):
     __abstract__ = True
 
     updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
-
