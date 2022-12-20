@@ -1,8 +1,9 @@
 # Auth_sprint_1
+**[Ссылка на репозиторий](https://github.com/Arkuk/Auth_sprint_1)**
 ## Как запустить проект
 **1) Склонировать проект**
 ```commandline
-git clone git@github.com:Arkuk/Auth_sprint_1.git
+git clone https://github.com/Arkuk/Auth_sprint_1.git
 ```
 **2) Перейти в папку Auth_sprint_1**
 ```commandline
@@ -25,7 +26,7 @@ docker compose up -d
 ## Как запустить тесты
 **1) Склонировать проект(если не склонирован)**
 ```commandline
-git clone git@github.com:Arkuk/Auth_sprint_1.git
+git clone https://github.com/Arkuk/Auth_sprint_1.git
 ```
 **2) Перейти в папку Auth_sprint_1/app/tests/functional/**
 ```commandline
