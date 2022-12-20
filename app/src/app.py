@@ -1,21 +1,22 @@
+import click
 from flask import Flask
-
-from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
-from db.postgres import db
+from flask_migrate import Migrate
+from passlib.hash import argon2
 
+from api import api
+from db.postgres import db
+from db.redis import jwt_redis_blocklist
 from models.role import Role
 from models.user import User
 from models.user_login_history import UserLoginHistory
 from models.user_role import user_role
-from api import api
-from db.redis import jwt_redis_blocklist
-from passlib.hash import argon2
-import click
+
+
 def create_app(config=None):
     app = Flask(__name__)
     # загрузка настроек для Flask
-    app.config.from_object('core.config.Settings')
+    app.config.from_object("core.config.Settings")
     # батарейка для миграций
     migrate = Migrate(app, db)
     # инициализация дб
@@ -27,26 +28,27 @@ def create_app(config=None):
 
     @app.cli.command("create-roles")
     def create_roles():
-        roles = ['admin', 'user', 'subscriber']
+        roles = ["admin", "user", "subscriber"]
         for role in roles:
             db.session.add(Role(name=role))
             db.session.commit()
 
     @app.cli.command("createsuperuser")
-    @click.argument('username',)
-    @click.argument('password')
+    @click.argument(
+        "username",
+    )
+    @click.argument("password")
     def create_superuser(username, password):
-        admin_role_id = db.session.execute(db.select(Role).filter_by(name='admin')).one()
-        new_user = User(username=username,
-                        password=argon2.using(rounds=4).hash(password),
-                        roles=list(admin_role_id))
+        admin_role_id = db.session.execute(
+            db.select(Role).filter_by(name="admin")
+        ).one()
+        new_user = User(
+            username=username,
+            password=argon2.using(rounds=4).hash(password),
+            roles=list(admin_role_id),
+        )
         db.session.add(new_user)
         db.session.commit()
-
-
-
-
-
 
     @jwt.token_in_blocklist_loader
     def check_if_token_is_revoked(jwt_header, jwt_payload: dict):

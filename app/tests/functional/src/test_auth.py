@@ -1,28 +1,25 @@
 import http
 
 import pytest
+from faker import Faker
 
 from tests.functional.models.user import User
 
-from faker import Faker
-
 fake = Faker()
 
-'''user = {
+"""user = {
     "username": fake.user_name(),
     "password": fake.password()
-}'''
+}"""
 
-user = {
-    "username": 'usertester',
-    "password": '123qWe!'
-}
+user = {"username": "usertester", "password": "123qWe!"}
 
 user = User(**user)
 
+
 @pytest.mark.asyncio
 async def test_register(make_request):
-    '''регистрация'''
+    """регистрация"""
     response = await make_request(
         endpoint="/register",
         http_method="post",
@@ -37,7 +34,7 @@ async def test_register(make_request):
 
 @pytest.mark.asyncio
 async def test_login(make_request):
-    '''вход в аккаунт'''
+    """вход в аккаунт"""
     response = await make_request(
         endpoint="/login",
         http_method="post",
@@ -47,13 +44,13 @@ async def test_login(make_request):
         },
     )
     assert response.status == http.HTTPStatus.OK
-    user.access_token = response.body['access_token']
-    user.refresh_token = response.body['refresh_token']
+    user.access_token = response.body["access_token"]
+    user.refresh_token = response.body["refresh_token"]
 
 
 @pytest.mark.asyncio
 async def test_login_wrongpassword(make_request):
-    '''проверка сценария, при котором пользователь ввел неверный пароль'''
+    """проверка сценария, при котором пользователь ввел неверный пароль"""
     response = await make_request(
         endpoint="/login",
         http_method="post",
@@ -67,46 +64,48 @@ async def test_login_wrongpassword(make_request):
 
 @pytest.mark.asyncio
 async def test_token_refresh(make_request):
-    '''проверка получения refresh token'''
+    """проверка получения refresh token"""
     response = await make_request(
         endpoint="/refresh",
         http_method="post",
-        headers={"Authorization": f"Bearer {user.refresh_token}"}
+        headers={"Authorization": f"Bearer {user.refresh_token}"},
     )
     assert response.status == http.HTTPStatus.OK
-    user.access_token = response.body['access_token']
-    user.refresh_token = response.body['refresh_token']
+    user.access_token = response.body["access_token"]
+    user.refresh_token = response.body["refresh_token"]
 
 
 @pytest.mark.asyncio
 async def test_user_me(make_request):
-    '''получение информации о юзере по токену'''
+    """получение информации о юзере по токену"""
     response = await make_request(
         endpoint="/me",
         http_method="get",
-        headers={"Authorization": f"Bearer {user.access_token}"}
+        headers={"Authorization": f"Bearer {user.access_token}"},
     )
     assert response.status == http.HTTPStatus.OK
 
 
 @pytest.mark.asyncio
 async def test_change_password(make_request):
-    '''изменение пароля'''
+    """изменение пароля"""
     response = await make_request(
         endpoint="/change_password",
         http_method="patch",
         headers={"Authorization": f"Bearer {user.access_token}"},
-        data={"old_password": user.password,
-              "new_password1": "Qwerty1!69",
-              "new_password2": "Qwerty1!69"}
+        data={
+            "old_password": user.password,
+            "new_password1": "Qwerty1!69",
+            "new_password2": "Qwerty1!69",
+        },
     )
     assert response.status == http.HTTPStatus.OK
-    user.password = 'Qwerty1!69'
+    user.password = "Qwerty1!69"
 
 
 @pytest.mark.asyncio
 async def test_login_history(make_request):
-    '''просмотр истории входа'''
+    """просмотр истории входа"""
     response = await make_request(
         endpoint="/login_history",
         http_method="get",
@@ -117,7 +116,7 @@ async def test_login_history(make_request):
 
 @pytest.mark.asyncio
 async def test_logout_access_token(make_request):
-    '''корректность выхода по access'''
+    """корректность выхода по access"""
     response = await make_request(
         endpoint="/logout",
         http_method="delete",
@@ -128,7 +127,7 @@ async def test_logout_access_token(make_request):
 
 @pytest.mark.asyncio
 async def test_logout_refresh_token(make_request):
-    '''корректность выхода по refresh'''
+    """корректность выхода по refresh"""
     response = await make_request(
         endpoint="/logout",
         http_method="delete",

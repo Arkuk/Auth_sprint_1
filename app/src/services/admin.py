@@ -1,8 +1,8 @@
-from db.postgres import db
 from flask_restx import abort
-from models.user import User
 from flask_restx._http import HTTPStatus
 
+from db.postgres import db
+from models.user import User
 
 
 class AdminService:
@@ -10,7 +10,7 @@ class AdminService:
         users = db.session.query(User.id, User.username).all()
         if users:
             return users
-        abort(HTTPStatus.NOT_FOUND, 'Not Found')
+        abort(HTTPStatus.NOT_FOUND, "Not Found")
 
 
 admin_service = AdminService()
