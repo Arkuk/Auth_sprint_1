@@ -35,4 +35,4 @@ class Roles(Resource):
     @api.response(int(HTTPStatus.CONFLICT), 'No role to discard from user')
     def delete(self, user_id):
         roles = user_roles.discard_role(user_id, api.payload)
-        return roles, 201
+        return roles, 204

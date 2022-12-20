@@ -32,7 +32,6 @@ def make_request(client_session):
         "delete": client_session.delete,
         'patch': client_session.patch,
     }
-
     async def inner(
             http_method: str,
             data: dict = {},

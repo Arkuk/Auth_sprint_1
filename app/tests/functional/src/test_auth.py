@@ -3,17 +3,22 @@ import http
 import pytest
 
 from tests.functional.models.user import User
+
 from faker import Faker
 
 fake = Faker()
 
-user = {
+'''user = {
     "username": fake.user_name(),
     "password": fake.password()
+}'''
+
+user = {
+    "username": 'usertester',
+    "password": '123qWe!'
 }
 
 user = User(**user)
-
 
 @pytest.mark.asyncio
 async def test_register(make_request):
