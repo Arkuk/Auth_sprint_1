@@ -4,6 +4,7 @@ import pytest
 from faker import Faker
 
 from tests.functional.models.user import User
+from tests.functional.utils.request import make_request
 
 fake = Faker()
 
@@ -18,9 +19,10 @@ user = User(**user)
 
 
 @pytest.mark.asyncio
-async def test_register(make_request):
+async def test_register(client_session):
     """регистрация"""
     response = await make_request(
+        client_session,
         endpoint="/register",
         http_method="post",
         data={
@@ -33,9 +35,10 @@ async def test_register(make_request):
 
 
 @pytest.mark.asyncio
-async def test_login(make_request):
+async def test_login(client_session):
     """вход в аккаунт"""
     response = await make_request(
+        client_session,
         endpoint="/login",
         http_method="post",
         data={
@@ -49,9 +52,10 @@ async def test_login(make_request):
 
 
 @pytest.mark.asyncio
-async def test_login_wrongpassword(make_request):
+async def test_login_wrongpassword(client_session):
     """проверка сценария, при котором пользователь ввел неверный пароль"""
     response = await make_request(
+        client_session,
         endpoint="/login",
         http_method="post",
         data={
@@ -63,9 +67,10 @@ async def test_login_wrongpassword(make_request):
 
 
 @pytest.mark.asyncio
-async def test_token_refresh(make_request):
+async def test_token_refresh(client_session):
     """проверка получения refresh token"""
     response = await make_request(
+        client_session,
         endpoint="/refresh",
         http_method="post",
         headers={"Authorization": f"Bearer {user.refresh_token}"},
@@ -76,9 +81,10 @@ async def test_token_refresh(make_request):
 
 
 @pytest.mark.asyncio
-async def test_user_me(make_request):
+async def test_user_me(client_session):
     """получение информации о юзере по токену"""
     response = await make_request(
+        client_session,
         endpoint="/me",
         http_method="get",
         headers={"Authorization": f"Bearer {user.access_token}"},
@@ -87,9 +93,10 @@ async def test_user_me(make_request):
 
 
 @pytest.mark.asyncio
-async def test_change_password(make_request):
+async def test_change_password(client_session):
     """изменение пароля"""
     response = await make_request(
+        client_session,
         endpoint="/change_password",
         http_method="patch",
         headers={"Authorization": f"Bearer {user.access_token}"},
@@ -104,9 +111,10 @@ async def test_change_password(make_request):
 
 
 @pytest.mark.asyncio
-async def test_login_history(make_request):
+async def test_login_history(client_session):
     """просмотр истории входа"""
     response = await make_request(
+        client_session,
         endpoint="/login_history",
         http_method="get",
         headers={"Authorization": f"Bearer {user.access_token}"},
@@ -115,9 +123,10 @@ async def test_login_history(make_request):
 
 
 @pytest.mark.asyncio
-async def test_logout_access_token(make_request):
+async def test_logout_access_token(client_session):
     """корректность выхода по access"""
     response = await make_request(
+        client_session,
         endpoint="/logout",
         http_method="delete",
         headers={"Authorization": f"Bearer {user.access_token}"},
@@ -126,9 +135,10 @@ async def test_logout_access_token(make_request):
 
 
 @pytest.mark.asyncio
-async def test_logout_refresh_token(make_request):
+async def test_logout_refresh_token(client_session):
     """корректность выхода по refresh"""
     response = await make_request(
+        client_session,
         endpoint="/logout",
         http_method="delete",
         headers={"Authorization": f"Bearer {user.refresh_token}"},
