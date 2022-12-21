@@ -28,7 +28,7 @@ def create_app(config=None):
 
     @app.cli.command("create-roles")
     def create_roles():
-        roles = ["admin", "user", "subscriber"]
+        roles = ("admin", "user", "subscriber")
         for role in roles:
             db.session.add(Role(name=role))
             db.session.commit()

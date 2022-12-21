@@ -2,8 +2,6 @@ from flask_restx import abort
 from flask_restx._http import HTTPStatus
 
 from db.postgres import db
-from models.role import Role
-from models.user import User
 from models.user_role import user_role
 
 

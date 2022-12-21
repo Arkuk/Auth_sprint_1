@@ -7,6 +7,7 @@ from schemas.user import (change_password_schema, login_history_schema,
                           user_schema_long_response)
 from services.auth import auth_service
 from services.user import user_service
+from core.config import settings
 
 api = Namespace("API для сайта и личного кабинета. Авторизованные пользователи")
 
@@ -18,7 +19,10 @@ change_password_schema = api.model("ChangePasswordSchema", change_password_schem
 
 responses_tokens = api.model("ResponsesTokens", responses_tokens)
 parser = reqparse.RequestParser()
-parser.add_argument("User-Agent", location="headers")
+
+
+parser.add_argument("page", type=int, default=0, help="page")
+parser.add_argument("per_page", type=int, default=settings.PAGE_LIMIT_HISTORY, help="Items per page")
 
 
 @api.route("/refresh")
@@ -29,7 +33,6 @@ class Refresh(Resource):
     @api.marshal_with(responses_tokens, code=int(HTTPStatus.OK))
     def post(self):
         jwt = get_jwt()
-        # user_agent = parser.parse_args()['User-Agent']
         result = auth_service.refresh_token(jwt)
         return result, 200
 
@@ -66,14 +69,16 @@ class ChangePassword(Resource):
 
 @api.route("/login_history")
 class LoginHistory(Resource):
+    @auth_service.verify_token()
+    @api.expect(parser)
     @api.response(int(HTTPStatus.UNAUTHORIZED), "Token is not corrected\n" "No token")
     @api.response(int(HTTPStatus.UNPROCESSABLE_ENTITY), "Token is not corrected\n")
     @api.marshal_list_with(login_history_schema, code=int(HTTPStatus.OK))
-    @auth_service.verify_token()
     def get(self):
         jwt = get_jwt()
         user_id = jwt["sub"]
-        result = user_service.get_login_history(user_id)
+        body = parser.parse_args()
+        result = user_service.get_login_history(user_id, body)
         return result, 200
 
 

@@ -6,7 +6,8 @@ from models.user import User
 
 
 class AdminService:
-    def get_list_data(self):
+    @staticmethod
+    def get_list_data():
         users = db.session.query(User.id, User.username).all()
         if users:
             return users

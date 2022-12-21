@@ -7,12 +7,14 @@ from models.user_role import user_role
 
 
 class RoleService:
-    def get_roles_list(self):
+    @staticmethod
+    def get_roles_list():
         """Получить список всех ролей сервиса"""
         roles = db.session.query(Role).all()
         return roles
 
-    def create_role(self, body: dict):
+    @staticmethod
+    def create_role(body: dict):
         """Создание новой роли, если роль уже существует, вернется сообщение об ошибке"""
         name = body["name"]
         role = db.session.query(Role).filter_by(name=name).all()
@@ -24,7 +26,8 @@ class RoleService:
         else:
             abort(HTTPStatus.CONFLICT, "Role is already exist")
 
-    def update_role(self, body: dict):
+    @staticmethod
+    def update_role(body: dict):
         """Изменить название роли"""
         role_id = body["id"]
         name = body["name"]
@@ -36,7 +39,8 @@ class RoleService:
         else:
             abort(HTTPStatus.CONFLICT, "No role to update")
 
-    def delete_role(self, body: dict):
+    @staticmethod
+    def delete_role(body: dict):
         """Удаление конкретной роли, если роль присвоена какому-либо пользователю, получим сообщение об ошибке"""
         role_id = body["id"]
         query = user_role.select().where(user_role.c.role_id == role_id)
